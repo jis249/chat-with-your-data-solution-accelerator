@@ -4,7 +4,7 @@ targetScope = 'subscription'
 @maxLength(20)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
 param environmentName string
-var abbrs = loadJsonContent('./abbreviations.json')
+param abbrs object = loadJsonContent('./abbreviations.json')
 
 param resourceToken string = toLower(uniqueString(subscription().id, environmentName, location))
 
@@ -12,7 +12,7 @@ param resourceToken string = toLower(uniqueString(subscription().id, environment
 param location string
 
 @description('Name of App Service plan')
-var hostingPlanName = '${abbrs.compute.appServicePlan}${resourceToken}'
+param hostingPlanName string = '${abbrs.compute.appServicePlan}-${resourceToken}'
 
 @description('The pricing tier for the App Service plan')
 @allowed([
