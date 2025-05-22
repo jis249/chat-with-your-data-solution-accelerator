@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.35.1.17967",
-      "templateHash": "10714130275821220011"
+      "templateHash": "2702088282632863582"
     }
   },
   "parameters": {
@@ -16,10 +16,6 @@
       "metadata": {
         "description": "Name of the the environment which is used to generate a short unique hash used in all resources."
       }
-    },
-    "abbrs": {
-      "type": "object",
-      "defaultValue": "[variables('$fxv#0')]"
     },
     "resourceToken": {
       "type": "string",
@@ -33,7 +29,7 @@
     },
     "hostingPlanName": {
       "type": "string",
-      "defaultValue": "[format('{0}-{1}', parameters('abbrs').compute.appServicePlan, parameters('resourceToken'))]",
+      "defaultValue": "",
       "metadata": {
         "description": "Name of App Service plan"
       }
@@ -761,21 +757,23 @@
         "virtualDesktopScalingPlan": "vdscaling-"
       }
     },
-    "azureCosmosDBAccountName": "[format('{0}{1}', parameters('abbrs').databases.cosmosDBDatabase, parameters('resourceToken'))]",
-    "azurePostgresDBAccountName": "[format('{0}{1}', parameters('abbrs').databases.postgreSQLDatabase, parameters('resourceToken'))]",
-    "websiteName": "[format('{0}{1}', parameters('abbrs').compute.webApp, parameters('resourceToken'))]",
+    "abbrs": "[variables('$fxv#0')]",
+    "hostingPlanNameVar": "[if(empty(parameters('hostingPlanName')), format('{0}-{1}', variables('abbrs').compute.appServicePlan, parameters('resourceToken')), parameters('hostingPlanName'))]",
+    "azureCosmosDBAccountName": "[format('{0}{1}', variables('abbrs').databases.cosmosDBDatabase, parameters('resourceToken'))]",
+    "azurePostgresDBAccountName": "[format('{0}{1}', variables('abbrs').databases.postgreSQLDatabase, parameters('resourceToken'))]",
+    "websiteName": "[format('{0}{1}', variables('abbrs').compute.webApp, parameters('resourceToken'))]",
     "adminWebsiteName": "[format('{0}-admin', variables('websiteName'))]",
-    "applicationInsightsName": "[format('{0}{1}', parameters('abbrs').managementGovernance.applicationInsights, parameters('resourceToken'))]",
-    "azureOpenAIResourceName": "[format('{0}{1}', parameters('abbrs').ai.openAIService, parameters('resourceToken'))]",
-    "computerVisionName": "[format('{0}{1}', parameters('abbrs').ai.computerVision, parameters('resourceToken'))]",
-    "azureAISearchName": "[format('{0}{1}', parameters('abbrs').ai.aiSearch, parameters('resourceToken'))]",
-    "storageAccountName": "[format('{0}{1}', parameters('abbrs').storage.storageAccount, parameters('resourceToken'))]",
-    "functionName": "[format('{0}{1}', parameters('abbrs').compute.functionApp, parameters('resourceToken'))]",
-    "formRecognizerName": "[format('{0}{1}', parameters('abbrs').ai.documentIntelligence, parameters('resourceToken'))]",
-    "contentSafetyName": "[format('{0}{1}', parameters('abbrs').ai.contentSafety, parameters('resourceToken'))]",
-    "speechServiceName": "[format('{0}{1}', parameters('abbrs').ai.speechService, parameters('resourceToken'))]",
-    "logAnalyticsName": "[format('{0}{1}', parameters('abbrs').managementGovernance.logAnalyticsWorkspace, parameters('resourceToken'))]",
-    "azureMachineLearningName": "[format('{0}{1}', parameters('abbrs').ai.machineLearningWorkspace, parameters('resourceToken'))]",
+    "applicationInsightsName": "[format('{0}{1}', variables('abbrs').managementGovernance.applicationInsights, parameters('resourceToken'))]",
+    "azureOpenAIResourceName": "[format('{0}{1}', variables('abbrs').ai.openAIService, parameters('resourceToken'))]",
+    "computerVisionName": "[format('{0}{1}', variables('abbrs').ai.computerVision, parameters('resourceToken'))]",
+    "azureAISearchName": "[format('{0}{1}', variables('abbrs').ai.aiSearch, parameters('resourceToken'))]",
+    "storageAccountName": "[format('{0}{1}', variables('abbrs').storage.storageAccount, parameters('resourceToken'))]",
+    "functionName": "[format('{0}{1}', variables('abbrs').compute.functionApp, parameters('resourceToken'))]",
+    "formRecognizerName": "[format('{0}{1}', variables('abbrs').ai.documentIntelligence, parameters('resourceToken'))]",
+    "contentSafetyName": "[format('{0}{1}', variables('abbrs').ai.contentSafety, parameters('resourceToken'))]",
+    "speechServiceName": "[format('{0}{1}', variables('abbrs').ai.speechService, parameters('resourceToken'))]",
+    "logAnalyticsName": "[format('{0}{1}', variables('abbrs').managementGovernance.logAnalyticsWorkspace, parameters('resourceToken'))]",
+    "azureMachineLearningName": "[format('{0}{1}', variables('abbrs').ai.machineLearningWorkspace, parameters('resourceToken'))]",
     "blobContainerName": "documents",
     "queueName": "doc-processing",
     "clientKey": "[format('{0}{1}', uniqueString(guid(subscription().id, deployment().name)), parameters('newGuidString'))]",
@@ -784,7 +782,7 @@
       "azd-env-name": "[parameters('environmentName')]"
     },
     "rgName": "[format('rg-{0}', parameters('environmentName'))]",
-    "keyVaultName": "[format('{0}{1}', parameters('abbrs').security.keyVault, parameters('resourceToken'))]",
+    "keyVaultName": "[format('{0}{1}', variables('abbrs').security.keyVault, parameters('resourceToken'))]",
     "baseUrl": "https://raw.githubusercontent.com/Azure-Samples/chat-with-your-data-solution-accelerator/main/",
     "appversion": "latest",
     "registryName": "cwydcontainerreg",
@@ -841,7 +839,7 @@
         "mode": "Incremental",
         "parameters": {
           "miName": {
-            "value": "[format('{0}{1}', parameters('abbrs').security.managedIdentity, parameters('resourceToken'))]"
+            "value": "[format('{0}{1}', variables('abbrs').security.managedIdentity, parameters('resourceToken'))]"
           },
           "solutionName": {
             "value": "[parameters('resourceToken')]"
@@ -2624,7 +2622,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[parameters('hostingPlanName')]",
+      "name": "[variables('hostingPlanNameVar')]",
       "resourceGroup": "[variables('rgName')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -2633,7 +2631,7 @@
         "mode": "Incremental",
         "parameters": {
           "name": {
-            "value": "[parameters('hostingPlanName')]"
+            "value": "[variables('hostingPlanNameVar')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -2746,7 +2744,7 @@
             "value": "3.11"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -3698,7 +3696,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploy_cosmos_db')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
@@ -3735,7 +3733,7 @@
             "value": "[format('{0}.azurecr.io/rag-webapp:{1}', variables('registryName'), variables('appversion'))]"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -4687,7 +4685,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploy_cosmos_db')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
@@ -4727,7 +4725,7 @@
             "value": "3.11"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -5601,7 +5599,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'computerVision')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
@@ -5638,7 +5636,7 @@
             "value": "[format('{0}.azurecr.io/rag-adminwebapp:{1}', variables('registryName'), variables('appversion'))]"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -6512,7 +6510,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'computerVision')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
@@ -8069,7 +8067,7 @@
             "value": "[parameters('location')]"
           },
           "hostingPlanName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "functionName": "[if(equals(parameters('hostingModel'), 'container'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}-docker', variables('functionName'))), '2022-09-01').outputs.functionName.value), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('functionName')), '2022-09-01').outputs.functionName.value))]",
           "websiteName": "[if(equals(parameters('hostingModel'), 'container'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}-docker', variables('websiteName'))), '2022-09-01').outputs.FRONTEND_API_NAME.value), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('websiteName')), '2022-09-01').outputs.FRONTEND_API_NAME.value))]",
@@ -8253,7 +8251,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('eventGridSystemTopicName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('functionName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}-docker', variables('functionName')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
@@ -8291,7 +8289,7 @@
             "value": "3.11"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -9550,7 +9548,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'computerVision')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",
@@ -9587,7 +9585,7 @@
             "value": "[format('{0}.azurecr.io/rag-backend:{1}', variables('registryName'), variables('appversion'))]"
           },
           "appServicePlanId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName')), '2022-09-01').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar')), '2022-09-01').outputs.name.value]"
           },
           "applicationInsightsName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring'), '2022-09-01').outputs.applicationInsightsName.value]"
@@ -10846,7 +10844,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'computerVision')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('contentSafetyName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('formRecognizerName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', parameters('hostingPlanName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('hostingPlanNameVar'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', variables('azureOpenAIResourceName'))]",

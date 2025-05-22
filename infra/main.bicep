@@ -4,7 +4,7 @@ targetScope = 'subscription'
 @maxLength(20)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
 param environmentName string
-param abbrs object = loadJsonContent('./abbreviations.json')
+var abbrs = loadJsonContent('./abbreviations.json')
 
 param resourceToken string = toLower(uniqueString(subscription().id, environmentName, location))
 
@@ -12,7 +12,8 @@ param resourceToken string = toLower(uniqueString(subscription().id, environment
 param location string
 
 @description('Name of App Service plan')
-param hostingPlanName string = '${abbrs.compute.appServicePlan}-${resourceToken}'
+param hostingPlanName string = ''
+var hostingPlanNameVar = empty(hostingPlanName) ? '${abbrs.compute.appServicePlan}-${resourceToken}' : hostingPlanName
 
 @description('The pricing tier for the App Service plan')
 @allowed([
@@ -574,10 +575,10 @@ module search './core/search/search-services.bicep' = if (databaseType == 'Cosmo
 }
 
 module hostingplan './core/host/appserviceplan.bicep' = {
-  name: hostingPlanName
+  name: hostingPlanNameVar
   scope: rg
   params: {
-    name: hostingPlanName
+    name: hostingPlanNameVar
     location: location
     sku: {
       name: hostingPlanSku
