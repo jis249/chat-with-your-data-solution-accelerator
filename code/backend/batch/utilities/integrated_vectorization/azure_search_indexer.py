@@ -38,15 +38,7 @@ class AzureSearchIndexer:
                 FieldMapping(
                     source_field_name="metadata_storage_path",
                     target_field_name="source",
-                ),
-                FieldMapping(
-                    source_field_name="/document/normalized_images/*/text",
-                    target_field_name="text",
-                ),
-                FieldMapping(
-                    source_field_name="/document/normalized_images/*/layoutText",
-                    target_field_name="layoutText",
-                ),
+                )
             ],
         )
         indexer_result = self.indexer_client.create_or_update_indexer(indexer)

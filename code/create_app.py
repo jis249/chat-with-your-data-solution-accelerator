@@ -41,36 +41,70 @@ def get_markdown_url(source, title, container_sas):
     return f"[{title}]({url})"
 
 
-def get_citations(citation_list):
-    """Returns Formated Citations."""
-    logger.info("Method get_citations started")
-    blob_client = AzureBlobStorageClient()
-    container_sas = blob_client.get_container_sas()
-    citations_dict = {"citations": []}
-    for citation in citation_list.get("citations"):
-        metadata = (
-            json.loads(citation["url"])
-            if isinstance(citation["url"], str)
-            else citation["url"]
-        )
-        title = citation["title"]
-        url = get_markdown_url(metadata["source"], title, container_sas)
-        citations_dict["citations"].append(
-            {
-                "content": url + "\n\n\n" + citation["content"],
-                "id": metadata["id"],
-                "chunk_id": (
-                    re.findall(r"\d+", metadata["chunk_id"])[-1]
-                    if metadata["chunk_id"] is not None
-                    else metadata["chunk"]
-                ),
+def get_citations(context):
+    """
+    Extract citations from context, handling null/missing metadata gracefully
+    """
+    citations = []
+
+    try:
+        for citation in context.get("citations", []):
+            # Get metadata with default empty dict if None
+            metadata = citation.get("metadata") or {}
+
+            # Log warning if metadata is missing/null
+            if not metadata:
+                logging.warning(f"Missing or null metadata for citation: {citation.get('content', 'Unknown content')[:50]}...")
+                # Create basic metadata from available citation data
+                metadata = {
+                    "source": citation.get("filepath", "Unknown Source"),
+                    "title": citation.get("title", "Unknown Title"),
+                    "chunk": 0,
+                    "chunk_id": citation.get("chunk_id", "unknown"),
+                    "id": citation.get("id", "unknown")
+                }
+
+            # Safely extract values with defaults
+            source = metadata.get("source", "Unknown Source")
+            title = metadata.get("title", "Unknown Title")
+            chunk = metadata.get("chunk", 0)
+            chunk_id = metadata.get("chunk_id", "unknown")
+            doc_id = metadata.get("id", "unknown")
+
+            # Construct URL JSON object
+            url_data = {
+                "id": doc_id,
+                "source": source,
                 "title": title,
-                "filepath": title.split("/")[-1],
-                "url": url,
+                "chunk": chunk,
+                "chunk_id": chunk_id
             }
-        )
-    logger.info("Method get_citations ended")
-    return citations_dict
+
+            # Try to get document URL, fallback to "#" if source is invalid
+            try:
+                document_url = get_markdown_url(source, title, container_sas) if source and source != "Unknown Source" else "#"
+            except Exception as e:
+                logging.warning(f"Failed to generate document URL for source '{source}': {e}")
+                document_url = "#"
+
+            citation_obj = {
+                "content": citation.get("content", ""),
+                "title": title,
+                "url": document_url,
+                "metadata": url_data,  # Your requested JSON structure
+                "chunk_id": chunk_id,
+                "reindex_id": metadata.get("reindex_id", "")
+            }
+
+            citations.append(citation_obj)
+
+    except Exception as e:
+        logging.error(f"Error processing citations: {str(e)}")
+        logging.exception("Full citation processing error:")
+        # Return empty citations rather than failing completely
+        return []
+
+    return citations
 
 
 def should_use_data(
